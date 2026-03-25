@@ -1,0 +1,24 @@
+{
+  "date": "2026-03-25",
+  "url": "http://localhost:3000",
+  "healthScore": 72,
+  "issues": [
+    { "id": "ISSUE-001", "title": "Rule 2 auto-fix appends duplicate/redundant suffix", "severity": "high", "category": "functional" },
+    { "id": "ISSUE-002", "title": "Category template change doesn't trigger rule validation", "severity": "high", "category": "functional" },
+    { "id": "ISSUE-003", "title": "Rule 7 false negative for single-digit date format", "severity": "high", "category": "functional" },
+    { "id": "ISSUE-004", "title": "Programmatic editor:change event triggers unexpected tab switch", "severity": "medium", "category": "functional" },
+    { "id": "ISSUE-005", "title": "Bottom bar HTML 복사 button always disabled", "severity": "medium", "category": "ux" },
+    { "id": "ISSUE-006", "title": "Rule 2 fix worsens title readability for valid suffixes", "severity": "medium", "category": "content" },
+    { "id": "ISSUE-007", "title": "favicon.ico 404 console errors", "severity": "low", "category": "console" }
+  ],
+  "categoryScores": {
+    "console": 40,
+    "functional": 70,
+    "ux": 80,
+    "content": 90,
+    "visual": 100,
+    "accessibility": 80,
+    "performance": 90,
+    "links": 100
+  }
+}

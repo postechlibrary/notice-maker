@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공지사항 편집기 — 박태준학술정보관</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Quill.js (로컬 복사: assets/vendor/) -->
+  <link rel="stylesheet" href="assets/vendor/quill.snow.css" />
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- ===== 좌측: 편집 패널 ===== -->
+    <aside class="edit-panel">
+      <header class="edit-panel__header">
+        <h1 class="app-title">공지사항 편집기</h1>
+        <span class="app-subtitle">박태준학술정보관</span>
+      </header>
+
+      <!-- 사용 안내 -->
+      <details class="how-to" id="how-to">
+        <summary class="how-to__summary">📖 처음 사용하세요? 사용 방법 보기</summary>
+        <ol class="how-to__steps">
+          <li><strong>카테고리 선택</strong> — 공지 종류(일반 안내/긴급 등)를 고르면 본문 템플릿이 자동으로 채워집니다.</li>
+          <li><strong>제목 입력</strong> — 한국어 제목을 쓰고, 「제안」 버튼을 누르면 영문 제목이 자동으로 채워집니다.</li>
+          <li><strong>부서·날짜 입력</strong> — 담당 부서명과 공지 날짜를 입력하세요.</li>
+          <li><strong>본문 작성</strong> — 아래 편집창을 <em>클릭</em>하면 커서가 생깁니다. 위의 툴바(B·I·U·H2·목록 등)로 서식을 적용하세요.</li>
+          <li><strong>검토</strong> — 오른쪽 「가이드라인」 탭에서 규칙 통과 여부를 확인합니다. 빨간 항목은 수정이 필요합니다.</li>
+          <li><strong>복사</strong> — 하단 준수율이 충분히 오르면 「HTML 복사」 버튼이 활성화됩니다. 눌러서 WordPress에 붙여 넣으세요.</li>
+        </ol>
+        <p class="how-to__tip">💡 <strong>단축키:</strong> Ctrl+S = 저장 &nbsp;|&nbsp; Ctrl+Shift+C = HTML 복사 &nbsp;|&nbsp; Ctrl+Shift+P = 미리보기</p>
+      </details>
+
+      <!-- ① 기본 정보 -->
+      <section class="meta-fields">
+        <p class="section-step"><span class="step-badge">①</span> 기본 정보 입력</p>
+        <div class="field-row">
+          <label for="category">카테고리</label>
+          <select id="category" class="input-select">
+            <option value="general">일반 안내</option>
+            <option value="event">정기 행사</option>
+            <option value="service">서비스 변경</option>
+            <option value="urgent">긴급 공지</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <label for="title-ko">제목 (한국어)</label>
+          <input type="text" id="title-ko" class="input-text" placeholder="예) 2026년도 1학기 대출 서비스 안내" />
+        </div>
+
+        <div class="field-row">
+          <label for="title-en">제목 (영문)</label>
+          <div class="input-with-btn">
+            <input type="text" id="title-en" class="input-text" placeholder="e.g. Spring 2026 Loan Service Guide" />
+            <button class="btn btn--suggest" id="btn-suggest-en" title="DeepL로 영문 제목 자동 제안">제안</button>
+          </div>
+        </div>
+
+        <div class="field-row field-row--half">
+          <div>
+            <label for="department">부서</label>
+            <input type="text" id="department" class="input-text" placeholder="학술서비스팀" />
+          </div>
+          <div>
+            <label for="notice-date">날짜</label>
+            <input type="date" id="notice-date" class="input-text" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ② 본문 작성 -->
+      <div class="editor-header">
+        <p class="section-step"><span class="step-badge">②</span> 본문 작성 <span class="editor-hint">— 아래 편집창을 클릭하면 입력 시작</span></p>
+        <div class="editor-toolbar-hint">
+          <span title="굵게">B</span>
+          <span title="기울임">I</span>
+          <span title="밑줄">U</span>
+          <span class="hint-sep">|</span>
+          <span title="중제목">H2</span>
+          <span title="소제목">H3</span>
+          <span class="hint-sep">|</span>
+          <span title="글머리 목록">☰ 목록</span>
+          <span class="hint-sep">|</span>
+          <span title="링크 삽입">🔗 링크</span>
+          <span title="이미지 삽입">🖼 이미지</span>
+          <span title="구분선 삽입">― 구분선</span>
+        </div>
+      </div>
+      <section class="editor-section">
+        <div id="quill-editor"></div>
+      </section>
+
+      <!-- 자동저장 복원 배너 (초기 로드 시 조건부 표시) -->
+      <div class="autosave-banner" id="autosave-banner" hidden>
+        <span class="autosave-banner__msg" id="autosave-msg">자동저장된 내용이 있습니다.</span>
+        <div class="autosave-banner__actions">
+          <button class="btn btn--sm btn--primary" id="btn-restore">복원</button>
+          <button class="btn btn--sm" id="btn-discard">무시</button>
+        </div>
+      </div>
+
+      <!-- 준수율 배너 (하단 고정) -->
+      <footer class="compliance-banner" id="compliance-banner">
+        <div class="compliance-banner__info">
+          <span class="compliance-banner__label">준수율</span>
+          <span class="compliance-banner__score" id="compliance-score">— / 10</span>
+        </div>
+        <div class="compliance-banner__bar">
+          <div class="compliance-banner__fill" id="compliance-fill" style="width: 0%"></div>
+        </div>
+        <button class="btn btn--copy" id="btn-copy" disabled>
+          HTML 복사
+        </button>
+        <button class="btn btn--sm btn--save" id="btn-save" title="스냅샷 저장 (Ctrl+S)">
+          저장
+        </button>
+      </footer>
+    </aside>
+
+    <!-- ===== 우측: 검토 패널 ===== -->
+    <main class="review-panel">
+      <!-- 탭 네비게이션 -->
+      <nav class="tabs" role="tablist">
+        <button class="tab tab--active" role="tab" data-tab="guidelines" aria-selected="true">가이드라인</button>
+        <button class="tab" role="tab" data-tab="fix" aria-selected="false">자동수정</button>
+        <button class="tab" role="tab" data-tab="preview" aria-selected="false">미리보기</button>
+        <button class="tab" role="tab" data-tab="html" aria-selected="false">HTML 출력</button>
+        <button class="tab" role="tab" data-tab="batch" aria-selected="false">배치 감사</button>
+        <button class="tab tab--icon" id="btn-admin" title="Admin 설정" aria-label="설정">⚙</button>
+      </nav>
+
+      <!-- 탭 콘텐츠 -->
+      <div class="tab-content">
+
+        <!-- 가이드라인 탭 -->
+        <section class="tab-pane tab-pane--active" id="tab-guidelines" role="tabpanel">
+          <div class="rules-list" id="rules-list">
+            <!-- rules.js에서 동적 렌더링 -->
+            <p class="rules-list__empty">제목 또는 본문을 입력하면 검증이 시작됩니다.</p>
+          </div>
+        </section>
+
+        <!-- 자동수정 탭 -->
+        <section class="tab-pane" id="tab-fix" role="tabpanel">
+          <div class="fix-panel">
+            <div class="fix-panel__toolbar">
+              <span class="fix-panel__label">자동수정 가능 규칙: <b id="fix-count">0</b>개</span>
+              <button class="btn btn--primary btn--sm" id="btn-fix-all" disabled>모두 적용</button>
+            </div>
+            <div class="fix-list" id="fix-list">
+              <p class="fix-list__empty">자동수정이 필요한 규칙이 없습니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 미리보기 탭 -->
+        <section class="tab-pane" id="tab-preview" role="tabpanel">
+          <div class="preview-container" id="preview-container">
+            <p class="preview-placeholder">미리보기를 보려면 내용을 입력하세요.</p>
+          </div>
+        </section>
+
+        <!-- HTML 출력 탭 -->
+        <section class="tab-pane" id="tab-html" role="tabpanel">
+          <div class="html-output">
+            <div class="html-output__toolbar">
+              <span class="html-output__label">WordPress 호환 HTML</span>
+              <button class="btn btn--sm" id="btn-slack" title="Slack 요약 복사">Slack 요약</button>
+              <button class="btn btn--sm" id="btn-copy-html">복사</button>
+            </div>
+            <pre class="html-output__code" id="html-output-code"><code></code></pre>
+          </div>
+        </section>
+
+        <!-- 배치 감사 탭 -->
+        <section class="tab-pane" id="tab-batch" role="tabpanel">
+          <div class="batch-panel">
+            <div class="batch-panel__desc">
+              WordPress "HTML 소스 보기"에서 복사한 공지 HTML을 붙여넣으세요.
+              여러 공지는 <code>---</code> 구분자로 이어붙이면 됩니다.
+            </div>
+            <textarea
+              id="batch-input"
+              class="batch-panel__input"
+              placeholder="공지 HTML 붙여넣기 (여러 개는 --- 로 구분)"
+              rows="8"
+            ></textarea>
+            <div class="batch-panel__toolbar">
+              <span class="batch-panel__count" id="batch-count">0개 공지 인식됨</span>
+              <button class="btn btn--sm" id="btn-batch-clear">초기화</button>
+              <button class="btn btn--primary btn--sm" id="btn-batch-run" disabled>감사 실행</button>
+            </div>
+            <div class="batch-results" id="batch-results"></div>
+            <div class="batch-footer" id="batch-footer" hidden>
+              <button class="btn btn--sm" id="btn-batch-csv">CSV 내보내기</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Admin 설정 모달 -->
+  <div class="modal" id="admin-modal" hidden>
+    <div class="modal__backdrop" id="admin-modal-backdrop"></div>
+    <div class="modal__box modal__box--wide">
+      <header class="modal__header">
+        <h2>Admin 설정</h2>
+        <button class="modal__close" id="admin-modal-close" aria-label="닫기">✕</button>
+      </header>
+
+      <div class="admin-body">
+        <!-- COPY_THRESHOLD 조정 -->
+        <section class="admin-section">
+          <h3 class="admin-section__title">HTML 복사 활성화 기준</h3>
+          <div class="admin-threshold">
+            <input type="range" id="threshold-range" min="50" max="100" step="10" value="100" class="threshold-range" />
+            <span class="threshold-value" id="threshold-value">100%</span>
+          </div>
+          <p class="admin-section__desc">준수율이 이 값 이상일 때 HTML 복사 버튼이 활성화됩니다.</p>
+        </section>
+
+        <!-- 규칙 on/off -->
+        <section class="admin-section">
+          <h3 class="admin-section__title">규칙 활성화</h3>
+          <p class="admin-section__desc">비활성화된 규칙은 검증에서 제외되고 준수율 계산에도 포함되지 않습니다.</p>
+          <ul class="admin-rules-list" id="admin-rules-list">
+            <!-- app.js에서 동적 렌더링 -->
+          </ul>
+        </section>
+
+        <!-- DeepL API Key -->
+        <section class="admin-section">
+          <h3 class="admin-section__title">DeepL API Key (영문 제목 자동 제안)</h3>
+          <div class="deepl-key-row">
+            <input type="password" id="deepl-key-input" class="input-text input-text--sm"
+              placeholder="DeepL Free API Key 입력" autocomplete="off" />
+            <button class="btn btn--sm btn--primary" id="btn-deepl-save">저장</button>
+            <button class="btn btn--sm" id="btn-deepl-test">테스트</button>
+          </div>
+          <p class="admin-section__desc">
+            <a href="https://www.deepl.com/pro-api" target="_blank" rel="noopener">DeepL Free API</a>
+            (월 500,000자 무료). Key는 브라우저 localStorage에만 저장됩니다.
+          </p>
+          <p class="deepl-test-result" id="deepl-test-result" hidden></p>
+        </section>
+
+        <!-- 위반 통계 -->
+        <section class="admin-section">
+          <h3 class="admin-section__title">이번 세션 위반 통계</h3>
+          <div class="stats-grid" id="stats-grid">
+            <p class="stats-empty">아직 검증 기록이 없습니다.</p>
+          </div>
+        </section>
+      </div>
+
+      <footer class="modal__footer">
+        <button class="btn btn--sm btn--danger" id="btn-admin-reset">초기화</button>
+        <button class="btn btn--primary" id="btn-admin-close">닫기</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- 저장/히스토리/템플릿 모달 -->
+  <div class="modal" id="storage-modal" hidden>
+    <div class="modal__backdrop" id="storage-modal-backdrop"></div>
+    <div class="modal__box modal__box--wide">
+      <header class="modal__header">
+        <h2>저장 및 템플릿</h2>
+        <button class="modal__close" id="storage-modal-close" aria-label="닫기">✕</button>
+      </header>
+
+      <!-- 탭 -->
+      <nav class="storage-tabs" role="tablist">
+        <button class="storage-tab storage-tab--active" role="tab" data-stab="history">버전 히스토리</button>
+        <button class="storage-tab" role="tab" data-stab="templates">템플릿 라이브러리</button>
+      </nav>
+
+      <!-- 히스토리 패널 -->
+      <div class="storage-pane storage-pane--active" id="stab-history">
+        <div class="storage-toolbar">
+          <span class="storage-toolbar__label">최대 5개 스냅샷 자동 관리</span>
+          <button class="btn btn--sm btn--primary" id="btn-snapshot">지금 저장</button>
+        </div>
+        <ul class="storage-list" id="history-list">
+          <li class="storage-list__empty">저장된 버전이 없습니다.</li>
+        </ul>
+      </div>
+
+      <!-- 템플릿 패널 -->
+      <div class="storage-pane" id="stab-templates">
+        <div class="storage-toolbar">
+          <button class="btn btn--sm" id="btn-import-tpl">가져오기</button>
+          <button class="btn btn--sm" id="btn-export-tpl">내보내기</button>
+          <button class="btn btn--sm btn--primary" id="btn-save-tpl">현재 내용 저장</button>
+        </div>
+        <ul class="storage-list" id="template-list">
+          <li class="storage-list__empty">저장된 템플릿이 없습니다.</li>
+        </ul>
+        <!-- 숨겨진 file input (가져오기) -->
+        <input type="file" id="import-file-input" accept=".json" hidden />
+      </div>
+    </div>
+  </div>
+
+  <!-- 템플릿 이름 입력 모달 -->
+  <div class="modal" id="tpl-name-modal" hidden>
+    <div class="modal__backdrop"></div>
+    <div class="modal__box modal__box--sm">
+      <header class="modal__header">
+        <h2>템플릿 이름</h2>
+        <button class="modal__close" id="tpl-name-close" aria-label="닫기">✕</button>
+      </header>
+      <div class="modal__body">
+        <input type="text" id="tpl-name-input" class="input-text" placeholder="예) 정기 행사 기본 양식" maxlength="50" />
+      </div>
+      <footer class="modal__footer">
+        <button class="btn btn--primary" id="tpl-name-confirm">저장</button>
+        <button class="btn" id="tpl-name-cancel">취소</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Clipboard 폴백 모달 -->
+  <div class="modal" id="clipboard-modal" hidden>
+    <div class="modal__backdrop"></div>
+    <div class="modal__box">
+      <header class="modal__header">
+        <h2>HTML 복사</h2>
+        <button class="modal__close" id="modal-close" aria-label="닫기">✕</button>
+      </header>
+      <p class="modal__desc">아래 내용을 전체 선택(Ctrl+A) 후 복사(Ctrl+C)하세요.</p>
+      <textarea class="modal__textarea" id="modal-textarea" readonly></textarea>
+    </div>
+  </div>
+
+  <!-- ES Module 진입점 -->
+  <script type="module" src="js/app.js"></script>
+  <!-- Quill (로컬 복사, 전역 필요) -->
+  <script src="assets/vendor/quill.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "notice-maker",
+  "version": "1.0.0",
+  "description": "POSTECH 박태준학술정보관 공지사항 편집기",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "pake ./index.html --name NoticeMaker --use-local-file --width 1400 --height 900 --targets msi",
+    "build:debug": "pake ./index.html --name NoticeMaker --use-local-file --width 1400 --height 900 --debug"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.0.0",
+    "jsdom": "^25.0.0",
+    "vitest": "^2.0.0"
+  },
+  "vitest": {
+    "environment": "jsdom",
+    "include": [
+      "tests/**/*.test.js"
+    ]
+  },
+  "dependencies": {
+    "quill": "^2.0.3"
+  }
+}

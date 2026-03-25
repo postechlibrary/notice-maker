@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__desktop-commander__read_file",
+      "mcp__desktop-commander__get_file_info",
+      "Skill(plan-eng-review)",
+      "Skill(plan-eng-review:*)",
+      "Bash(cmd /c \"dir c:\\\\vibe\\\\notice_maker\\\\assets\\\\vendor\")",
+      "Bash(npm install:*)",
+      "Bash(cmd /c \"dir c:\\\\vibe\\\\notice_maker\\\\node_modules\\\\quill\\\\dist 2>nul | findstr /i \"\"quill\"\"\")",
+      "Bash(cmd /c \"dir c:\\\\vibe\\\\notice_maker\\\\node_modules\\\\quill 2>nul\")"
+    ]
+  }
+}
