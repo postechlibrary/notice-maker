@@ -1085,6 +1085,47 @@ function initEventListeners() {
 }
 
 // ──────────────────────────────────────────────
+// 리사이저 (화면 분할 조절)
+// ──────────────────────────────────────────────
+
+function initResizer() {
+  const resizer = $('#layout-resizer');
+  const editPanel = $('.edit-panel');
+  if (!resizer || !editPanel) return;
+
+  let isResizing = false;
+
+  resizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    resizer.classList.add('is-resizing');
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'col-resize';
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    const minWidth = 300;
+    const maxWidth = window.innerWidth - 300;
+    let newWidth = e.clientX;
+    
+    if (newWidth < minWidth) newWidth = minWidth;
+    if (newWidth > maxWidth) newWidth = maxWidth;
+    
+    const newWidthPercentage = (newWidth / window.innerWidth) * 100;
+    editPanel.style.width = `${newWidthPercentage}%`;
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (isResizing) {
+      isResizing = false;
+      resizer.classList.remove('is-resizing');
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    }
+  });
+}
+
+// ──────────────────────────────────────────────
 // 앱 초기화
 // ──────────────────────────────────────────────
 
@@ -1095,6 +1136,7 @@ function init() {
   initEventListeners();
   initKeyboardShortcuts();
   initBatchPanel();
+  initResizer();
 
   // 초기 날짜 오늘로
   const today = new Date().toISOString().split('T')[0];

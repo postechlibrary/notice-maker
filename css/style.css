@@ -61,7 +61,7 @@
   --space-8: 2rem;
 
   /* 레이아웃 */
-  --edit-panel-width:   420px;
+  --edit-panel-width:   50%;
   --banner-height:      72px;
   --header-height:      56px;
   --radius-sm:          4px;
@@ -120,6 +120,19 @@ html, body {
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
   overflow-y: auto;
+}
+
+/* 중앙 크기 조절 핸들 */
+.layout-resizer {
+  width: 6px;
+  background-color: var(--color-border);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background-color var(--transition);
+  z-index: 10;
+}
+.layout-resizer:hover, .layout-resizer.is-resizing {
+  background-color: var(--color-primary);
 }
 
 /* 준수율 배너 — 스크롤 시에도 하단 고정 (아래 규칙과 병합) */
