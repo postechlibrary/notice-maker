@@ -16,13 +16,7 @@ const DEBOUNCE_MS = 500;
 // Quill 툴바 설정
 // ──────────────────────────────────────────────
 
-const TOOLBAR_OPTIONS = [
-  ['bold', 'italic', 'underline'],
-  [{ header: 2 }, { header: 3 }],
-  [{ list: 'bullet' }, { list: 'ordered' }],
-  ['link', 'image'],
-  ['hr'],  // custom blot (아래 등록)
-];
+const TOOLBAR_OPTIONS = '#custom-toolbar';
 
 // ──────────────────────────────────────────────
 // HR custom blot 등록
@@ -69,6 +63,22 @@ export function init(selector = '#quill-editor') {
     quill.setSelection(range.index + 1, 'silent');
   };
 
+  // 기본 SVG 아이콘을 텍스트로 덮어씌워 커스텀 툴바(B/H2/목록) 유지
+  const icons = Quill.import('ui/icons');
+  if (icons) {
+    icons.bold = 'B';
+    icons.italic = 'I';
+    icons.underline = 'U';
+    if (!icons.header) icons.header = {};
+    icons.header['2'] = 'H2';
+    icons.header['3'] = 'H3';
+    if (!icons.list) icons.list = {};
+    icons.list['bullet'] = '☰ 목록';
+    icons.link = '🔗 링크';
+    icons.image = '🖼 이미지';
+    icons.hr = '구분선';
+  }
+
   quill = new Quill(selector, {
     theme: 'snow',
     placeholder: '공지사항 본문을 입력하세요...',
@@ -78,8 +88,7 @@ export function init(selector = '#quill-editor') {
         handlers: { hr: hrHandler },
       },
       clipboard: {
-        // 외부 서식 제거 (WordPress 붙여넣기 등)
-        matchVisual: false,
+        // Quill 2.0부터 matchVisual 옵션은 지원되지 않음
       },
       history: {
         delay: 1000,

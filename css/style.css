@@ -313,8 +313,42 @@ label {
   line-height: var(--leading-loose);
 }
 
-/* Quill 툴바 오버라이드 */
-.ql-toolbar.ql-snow {
+/* Quill 툴바 오버라이드 및 커스텀 툴바 */
+#custom-toolbar.ql-toolbar.ql-snow {
+  background: #fff8e7;
+  border: 1px solid #ffe8a0;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+#custom-toolbar.ql-toolbar.ql-snow button {
+  width: auto;
+  height: auto;
+  padding: 4px 6px;
+  font-family: var(--font-base);
+  font-size: 13px;
+  font-weight: 600;
+  color: #8a6a00;
+  border-radius: 4px;
+}
+#custom-toolbar.ql-toolbar.ql-snow button:hover,
+#custom-toolbar.ql-toolbar.ql-snow button.ql-active {
+  background: rgba(138, 106, 0, 0.1);
+  color: #6b5200;
+}
+#custom-toolbar.ql-toolbar.ql-snow .hint-sep {
+  color: #dfc880;
+  cursor: default;
+  margin: 0 2px;
+}
+
+/* 기본 Quill 툴바 폴백 오버라이드 */
+.ql-toolbar.ql-snow:not(#custom-toolbar) {
   border-color: var(--color-border);
   background: var(--color-surface-2);
   flex-shrink: 0;
@@ -1188,8 +1222,13 @@ ins.diff-ins {
 
 /* ===== 3단계: 자동저장 배너 ===== */
 
-.autosave-banner {
+.autosave-banner:not([hidden]) {
   display: flex;
+}
+.autosave-banner[hidden] {
+  display: none !important;
+}
+.autosave-banner {
   align-items: center;
   gap: .5rem;
   padding: .5rem .75rem;
