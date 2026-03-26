@@ -119,8 +119,10 @@ html, body {
   flex-direction: column;
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
-  overflow: hidden;
+  overflow-y: auto;
 }
+
+/* 준수율 배너 — 스크롤 시에도 하단 고정 (아래 규칙과 병합) */
 
 .edit-panel__header {
   padding: var(--space-4) var(--space-5);
@@ -236,12 +238,12 @@ html, body {
 
 /* 메타 필드 */
 .meta-fields {
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-3) var(--space-5);
   border-bottom: 1px solid var(--color-border-light);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .field-row {
@@ -272,7 +274,7 @@ label {
 .input-text,
 .input-select {
   width: 100%;
-  padding: var(--space-2) var(--space-3);
+  padding: 0.35rem var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-bg);
@@ -300,7 +302,7 @@ label {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 220px;
 }
 
 #quill-editor {
@@ -340,6 +342,9 @@ label {
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
 }
 
 .compliance-banner__info {
